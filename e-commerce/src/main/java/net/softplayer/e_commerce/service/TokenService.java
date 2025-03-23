@@ -17,11 +17,21 @@ public class TokenService {
 		this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 
-	public String generateToken(Integer id) {
+	public String generateToken(Long id) {
 		return Jwts.builder()
 				.issuer(ISSUER)
 				.claim("id", id.toString())
 				.signWith(secretKey)
 				.compact();
+	}
+
+	public Long verifyToken(String token) {
+		String userIdString = Jwts.parser()
+			.verifyWith(secretKey)
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("id", String.class);
+		return Long.parseLong(userIdString);
 	}
 }
